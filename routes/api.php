@@ -6,6 +6,7 @@ use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\MaterialController;
+use App\Http\Controllers\Api\ApiQuizController;
 
 /*
 |--------------------------------------------------------------------------
@@ -48,6 +49,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/enrolled-courses', [UserController::class, 'getEnrolledCoursesApi']);
 
     Route::get('/courses/{course}/materials', [MaterialController::class, 'indexApi']);
+
+    // For Attempt Quiz
+    Route::get('/courses/{course}/quiz/start', [ApiQuizController::class, 'start']);
+    Route::post('/courses/{course}/quiz/submit', [ApiQuizController::class, 'submit']);
+    Route::get('/courses/{course}/quiz/finish', [ApiQuizController::class, 'finish']);
+
 
     // Add other protected routes here (e.g., enrolling in a course, accessing user-specific materials)
 });
