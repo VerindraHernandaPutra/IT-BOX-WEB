@@ -34,6 +34,10 @@ Route::middleware('auth:sanctum')->group(function () {
         return $request->user();
     });
 
+    // Certificate routes - Fixed endpoints
+    Route::get('/user/certificates', [CertificateController::class, 'getUserCertificates']);
+    Route::get('/certificates/{certificate}/download-pdf', [CertificateController::class, 'downloadPdf']);
+
     Route::put('/user/profile', [UserController::class, 'updateProfileApi']);
 
     // Your existing protected course routes
