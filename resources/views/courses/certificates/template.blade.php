@@ -35,10 +35,6 @@
         <h2>{{ $certificate->user->name }}</h2>
         <p>has successfully completed the course</p>
         <h3>{{ $certificate->course->course_name }}</h3>
-        {{-- <div class="signature">
-            <p>Instructor Signature</p>
-            <img src="{{ asset('storage/images/signature.png') }}" alt="Signature" width="150">
-        </div> --}}
     </div>
 </body>
 </html>

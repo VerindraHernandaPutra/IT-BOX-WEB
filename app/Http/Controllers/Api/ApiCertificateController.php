@@ -1,58 +1,61 @@
 <?php
 
-namespace App\Http\Controllers;
+// Namespace should match the folder structure
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Certificate;
 
-class CertificateController extends Controller
+// Class name should match the file name
+class ApiCertificateController extends Controller
 {
-    public function downloadPdf(Certificate $certificate)
+    /**
+     * Generate and stream a PDF certificate for download.
+     */
+    public function downloadPdf(Request $request, Certificate $certificate)
     {
-        $user = auth()->user();
+        $user = $request->user();
 
-        // Pastikan hanya user yang memiliki sertifikat ini yang bisa mendownload
-        // if ($certificate->user_id !== $user->id) {
-        //     abort(403, 'Unauthorized action.');
-        // }
-        
         if ($certificate->user_id !== $user->id) {
             return response()->json(['message' => 'Unauthorized action.'], 403);
         }
         
         try {
-            $pdf = Pdf::loadView('courses.certificates.template', compact('certificate'));
-            $fileName = 'Certificate-' . $certificate->course->course_name . '.pdf';
-            return $pdf->stream($fileName, [
-                'Content-Type' => 'application/pdf',
-                'Content-Disposition' => 'attachment; filename="' . $fileName . '"'
-            ]);
+            // Prepare data for the Blade view
+            $data = [
+                'userName' => $certificate->user->name,
+                'courseName' => $certificate->course->course_name,
+                'issuedDate' => $certificate->issued_at->format('d F Y'),
+            ];
+
+            $pdf = Pdf::loadView('courses.certificates.template', $data)
+                      ->setPaper('a4', 'landscape');
+            
+            $fileName = 'Certificate-' . str_replace(' ', '_', $certificate->course->course_name) . '.pdf';
+            
+            return $pdf->stream($fileName);
             
         } catch (\Exception $e) {
+            \Log::error('PDF Generation Failed: ' . $e->getMessage());
             return response()->json(['message' => 'Failed to generate certificate.'], 500);
         }
-        //     return $pdf->download($fileName);
-        // } catch (\Exception $e) {
-        //     return response()->json(['message' => 'Failed to generate certificate.'], 500);
-        // }
-
-        // // Load view sertifikat
-        // $pdf = Pdf::loadView('courses.certificates.template', compact('certificate'));
-
-        // // Nama file untuk di-download
-        // $fileName = 'Certificate-' . $certificate->course->course_name . '.pdf';
-
-        // // Download PDF
-        // return $pdf->download($fileName);
     }
 
+    /**
+     * Get all certificates for the currently authenticated user.
+     */
     public function getUserCertificates(Request $request){
-    $user = $request->user(); // Mendapatkan user yang sedang login
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
 
-    // Mendapatkan sertifikat yang dimiliki oleh user berdasarkan relasi
-    $certificates = $user->certificates()->with('course')->get();; // Asumsi ada relasi antara User dan Certificate
+        // Eager load the 'course' relationship and fix the syntax error
+        $certificates = $user->certificates()->with('course')->get(); // REMOVED the extra semicolon
 
-    return response()->json($certificates);
+        // Wrap the response in a "data" key to be consistent
+        return response()->json(['data' => $certificates]);
     }
 }

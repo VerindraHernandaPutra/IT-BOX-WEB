@@ -7,6 +7,7 @@ use App\Http\Controllers\Api\CourseController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\MaterialController;
 use App\Http\Controllers\Api\ApiQuizController;
+use App\Http\Controllers\Api\ApiCertificateController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,8 +36,8 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Certificate routes - Fixed endpoints
-    Route::get('/user/certificates', [CertificateController::class, 'getUserCertificates']);
-    Route::get('/certificates/{certificate}/download-pdf', [CertificateController::class, 'downloadPdf']);
+    Route::get('/user/certificates', [ApiCertificateController::class, 'getUserCertificates']);
+    Route::get('/certificates/{certificate}/download-pdf', [ApiCertificateController::class, 'downloadPdf']);
 
     Route::put('/user/profile', [UserController::class, 'updateProfileApi']);
 
