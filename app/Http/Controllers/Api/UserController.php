@@ -78,7 +78,7 @@ class UserController extends Controller
                 'price' => $course->course_price, // From DB
                 'type' => $course->course_type,   // From DB
                 'description' => $course->description,
-                'thumbnail' => $course->thumbnail, // Assuming this is the full URL
+                'thumbnail' => $course->thumbnail_url, // Assuming this is the full URL
                                                    // or $course->thumbnail_url if you have an accessor
                 // Add any other fields your Flutter CourseCard might need
             ];
