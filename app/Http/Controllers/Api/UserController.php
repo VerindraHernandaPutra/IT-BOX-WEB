@@ -6,20 +6,16 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
-// Assuming your Course model has an accessor for thumbnail_url if needed,
-// or that 'thumbnail' field already contains the full URL.
+use Illuminate\Support\Facades\Storage; // <-- THIS IS THE LINE YOU WERE MISSING
 
 class UserController extends Controller
 {
 
     public function updateProfileApi(Request $request)
     {
-        $user = $request->user(); // Get the authenticated user
+        $user = $request->user();
 
-        if (!$user) {
-            return response()->json(['message' => 'Unauthenticated.'], 401);
-        }
-
+        // Validate the incoming data
         $validatedData = $request->validate([
             'name' => 'required|string|max:255',
             'email' => [
@@ -27,38 +23,35 @@ class UserController extends Controller
                 'string',
                 'email',
                 'max:255',
-                Rule::unique('users')->ignore($user->id), // Email must be unique, except for the current user
+                Rule::unique('users')->ignore($user->id),
             ],
-            // If you want to allow password changes here, uncomment and adjust:
-            // 'current_password' => 'nullable|string|required_with:new_password',
-            // 'new_password' => 'nullable|string|min:8|confirmed',
+            // Add validation for the image
+            'user_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
         ]);
 
+        // Handle the file upload
+        if ($request->hasFile('user_image')) {
+            // Delete the old image if it exists
+            if ($user->user_image) {
+                // This line will now work correctly
+                Storage::disk('public')->delete($user->user_image);
+            }
+            // Store the new image and get its path
+            $path = $request->file('user_image')->store('profile_images', 'public');
+            $user->user_image = $path;
+        }
+
+        // Update name and email
         $user->name = $validatedData['name'];
         $user->email = $validatedData['email'];
-
-        // Example for password update (ensure you have 'new_password_confirmation' field from client)
-        // if (!empty($validatedData['new_password'])) {
-        //     if (!Hash::check($validatedData['current_password'], $user->password)) {
-        //         return response()->json(['errors' => ['current_password' => ['Current password does not match.']]], 422);
-        //     }
-        //     $user->password = Hash::make($validatedData['new_password']);
-        // }
-
         $user->save();
 
-        // Return the updated user data (excluding sensitive info)
+        // Return a success response with the updated user data
         return response()->json([
-            'message' => 'Profile updated successfully.',
-            'user' => [
-                // It's good practice to return the updated user object
-                // so the frontend can use it directly if needed.
-                'id' => $user->id,
-                'name' => $user->name,
-                'email' => $user->email,
-                // Add other relevant, non-sensitive fields
-            ]
-        ], 200);
+            'message' => 'Profile updated successfully!',
+            // Use .fresh() to get the model with the latest data, including the accessor
+            'user' => $user->fresh(),
+        ]);
     }
 
     public function getEnrolledCoursesApi(Request $request)
@@ -69,25 +62,20 @@ class UserController extends Controller
         }
 
         $courses = $user->courses()->get()->map(function($course) {
-            // Format this to match the structure your Flutter Course model expects
-            // and what your /api/courses (all courses) endpoint returns
             return [
                 'id' => $course->id,
-                'name' => $course->course_name, // From DB
-                'hours' => $course->course_hour, // From DB
-                'price' => $course->course_price, // From DB
-                'type' => $course->course_type,   // From DB
+                'name' => $course->course_name,
+                'hours' => $course->course_hour,
+                'price' => $course->course_price,
+                'type' => $course->course_type,
                 'description' => $course->description,
-                'thumbnail' => $course->thumbnail_url, // Assuming this is the full URL
-                                                   // or $course->thumbnail_url if you have an accessor
-                // Add any other fields your Flutter CourseCard might need
+                'thumbnail' => $course->thumbnail_url, // Uses the accessor from the Course model
             ];
         });
 
         return response()->json(['data' => $courses]);
     }
 
-    // getEnrolledCourseIdsApi can remain if needed elsewhere, or be removed if this replaces its use case
     public function getEnrolledCourseIdsApi(Request $request)
     {
         $user = $request->user();
@@ -96,5 +84,29 @@ class UserController extends Controller
         }
         $enrolledCourseIds = $user->courses()->pluck('course.id');
         return response()->json(['data' => $enrolledCourseIds]);
+    }
+
+    public function getActivityStatsApi(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        // 1. Certificate count is the number of certificates the user has.
+        $certificateCount = $user->certificates()->count();
+
+        // 2. "Completed" courses are the ones for which a certificate has been issued.
+        $completedCount = $certificateCount;
+
+        // 3. "Incomplete" courses are total enrolled courses minus completed ones.
+        $totalEnrolledCount = $user->courses()->count();
+        $incompleteCount = $totalEnrolledCount - $completedCount;
+
+        return response()->json([
+            'incomplete' => $incompleteCount,
+            'completed' => $completedCount,
+            'certificates' => $certificateCount,
+        ]);
     }
 }

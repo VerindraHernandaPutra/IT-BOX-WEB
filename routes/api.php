@@ -39,7 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/certificates', [ApiCertificateController::class, 'getUserCertificates']);
     Route::get('/certificates/{certificate}/download-pdf', [ApiCertificateController::class, 'downloadPdf']);
 
-    Route::put('/user/profile', [UserController::class, 'updateProfileApi']);
+    Route::post('/user/profile', [UserController::class, 'updateProfileApi']);
 
     // Your existing protected course routes
     Route::post('/courses', [CourseController::class, 'apiStore']);
@@ -59,6 +59,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/courses/{course}/quiz/start', [ApiQuizController::class, 'start']);
     Route::post('/courses/{course}/quiz/submit', [ApiQuizController::class, 'submit']);
     Route::get('/courses/{course}/quiz/finish', [ApiQuizController::class, 'finish']);
+
+    Route::get('/user/activity-stats', [UserController::class, 'getActivityStatsApi']);
 
 
     // Add other protected routes here (e.g., enrolling in a course, accessing user-specific materials)
