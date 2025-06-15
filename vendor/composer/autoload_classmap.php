@@ -6,8 +6,12 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Http\\Controllers\\Api\\ApiCertificateController' => $baseDir . '/app/Http/Controllers/Api/ApiCertificateController.php',
+    'App\\Http\\Controllers\\Api\\ApiQuizController' => $baseDir . '/app/Http/Controllers/Api/ApiQuizController.php',
     'App\\Http\\Controllers\\Api\\AuthController' => $baseDir . '/app/Http/Controllers/Api/AuthController.php',
     'App\\Http\\Controllers\\Api\\CourseController' => $baseDir . '/app/Http/Controllers/Api/CourseController.php',
+    'App\\Http\\Controllers\\Api\\MaterialController' => $baseDir . '/app/Http/Controllers/Api/MaterialController.php',
+    'App\\Http\\Controllers\\Api\\UserController' => $baseDir . '/app/Http/Controllers/Api/UserController.php',
     'App\\Http\\Controllers\\Auth\\AuthenticatedSessionController' => $baseDir . '/app/Http/Controllers/Auth/AuthenticatedSessionController.php',
     'App\\Http\\Controllers\\Auth\\ConfirmablePasswordController' => $baseDir . '/app/Http/Controllers/Auth/ConfirmablePasswordController.php',
     'App\\Http\\Controllers\\Auth\\EmailVerificationNotificationController' => $baseDir . '/app/Http/Controllers/Auth/EmailVerificationNotificationController.php',

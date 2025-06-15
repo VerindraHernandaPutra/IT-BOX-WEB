@@ -566,8 +566,12 @@ class ComposerStaticInit626b9e7ddd47fb7eff9aaa53cce0c9ad
     );
 
     public static $classMap = array (
+        'App\\Http\\Controllers\\Api\\ApiCertificateController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/ApiCertificateController.php',
+        'App\\Http\\Controllers\\Api\\ApiQuizController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/ApiQuizController.php',
         'App\\Http\\Controllers\\Api\\AuthController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/AuthController.php',
         'App\\Http\\Controllers\\Api\\CourseController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/CourseController.php',
+        'App\\Http\\Controllers\\Api\\MaterialController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/MaterialController.php',
+        'App\\Http\\Controllers\\Api\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/UserController.php',
         'App\\Http\\Controllers\\Auth\\AuthenticatedSessionController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/AuthenticatedSessionController.php',
         'App\\Http\\Controllers\\Auth\\ConfirmablePasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/ConfirmablePasswordController.php',
         'App\\Http\\Controllers\\Auth\\EmailVerificationNotificationController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/EmailVerificationNotificationController.php',

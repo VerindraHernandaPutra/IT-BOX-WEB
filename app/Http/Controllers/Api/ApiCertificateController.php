@@ -21,24 +21,17 @@ class ApiCertificateController extends Controller
         if ($certificate->user_id !== $user->id) {
             return response()->json(['message' => 'Unauthorized action.'], 403);
         }
-        
-        try {
-            // Prepare data for the Blade view
-            $data = [
-                'userName' => $certificate->user->name,
-                'courseName' => $certificate->course->course_name,
-                'issuedDate' => $certificate->issued_at->format('d F Y'),
-            ];
 
-            $pdf = Pdf::loadView('courses.certificates.template', $data)
-                      ->setPaper('a4', 'landscape');
-            
+        try {
+            // Kirim object certificate langsung ke view
+            $pdf = Pdf::loadView('courses.certificates.template', compact('certificate'))
+                    ->setPaper('a4', 'landscape');
+
             $fileName = 'Certificate-' . str_replace(' ', '_', $certificate->course->course_name) . '.pdf';
-            
+
             return $pdf->stream($fileName);
-            
         } catch (\Exception $e) {
-            \Log::error('PDF Generation Failed: ' . $e->getMessage());
+            Log::error('PDF Generation Failed: ' . $e->getMessage());
             return response()->json(['message' => 'Failed to generate certificate.'], 500);
         }
     }
