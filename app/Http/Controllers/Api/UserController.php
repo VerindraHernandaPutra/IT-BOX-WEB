@@ -85,4 +85,28 @@ class UserController extends Controller
         $enrolledCourseIds = $user->courses()->pluck('course.id');
         return response()->json(['data' => $enrolledCourseIds]);
     }
+
+    public function getActivityStatsApi(Request $request)
+    {
+        $user = $request->user();
+        if (!$user) {
+            return response()->json(['message' => 'Unauthenticated.'], 401);
+        }
+
+        // 1. Certificate count is the number of certificates the user has.
+        $certificateCount = $user->certificates()->count();
+
+        // 2. "Completed" courses are the ones for which a certificate has been issued.
+        $completedCount = $certificateCount;
+
+        // 3. "Incomplete" courses are total enrolled courses minus completed ones.
+        $totalEnrolledCount = $user->courses()->count();
+        $incompleteCount = $totalEnrolledCount - $completedCount;
+
+        return response()->json([
+            'incomplete' => $incompleteCount,
+            'completed' => $completedCount,
+            'certificates' => $certificateCount,
+        ]);
+    }
 }
