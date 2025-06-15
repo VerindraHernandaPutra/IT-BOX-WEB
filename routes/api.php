@@ -39,7 +39,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/user/certificates', [ApiCertificateController::class, 'getUserCertificates']);
     Route::get('/certificates/{certificate}/download-pdf', [ApiCertificateController::class, 'downloadPdf']);
 
-    Route::put('/user/profile', [UserController::class, 'updateProfileApi']);
+    Route::post('/user/profile', [UserController::class, 'updateProfileApi']);
 
     // Your existing protected course routes
     Route::post('/courses', [CourseController::class, 'apiStore']);

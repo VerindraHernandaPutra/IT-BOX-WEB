@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Support\Facades\Storage;
 use Laravel\Sanctum\HasApiTokens;
 
 class User extends Authenticatable
@@ -23,7 +24,21 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'user_image',
     ];
+
+    protected $appends = ['user_image_url'];
+
+    public function getUserImageUrlAttribute()
+    {
+        if ($this->user_image) {
+            // Return the full public URL of the stored image.
+            return Storage::disk('public')->url($this->user_image);
+        }
+
+        // Return null if no image is set.
+        return null;
+    }
 
     public function enrolledCourses()
     {
