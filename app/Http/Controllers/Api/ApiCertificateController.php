@@ -27,7 +27,7 @@ class ApiCertificateController extends Controller
             $pdf = Pdf::loadView('courses.certificates.template', compact('certificate'))
                     ->setPaper('a4', 'landscape');
 
-            $fileName = 'Certificate-' . str_replace(' ', '_', $certificate->course->course_name) . '.pdf';
+            $fileName = 'Certificate-' . $certificate->course->course_name . '.pdf';
 
             return $pdf->stream($fileName);
         } catch (\Exception $e) {
