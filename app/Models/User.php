@@ -32,12 +32,11 @@ class User extends Authenticatable
     public function getUserImageUrlAttribute()
     {
         if ($this->user_image) {
-            // Return the full public URL of the stored image.
-            return Storage::disk('public')->url($this->user_image);
+            return asset('storage/' . $this->user_image) . '?v=' . $this->updated_at->timestamp;
         }
 
-        // Return null if no image is set.
-        return null;
+        // Return a default avatar image if no user_image is set.
+        return asset('storage/profile_images/default-avatar.png');
     }
 
     public function enrolledCourses()

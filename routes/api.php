@@ -61,6 +61,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/courses/{course}/quiz/finish', [ApiQuizController::class, 'finish']);
 
     Route::get('/user/activity-stats', [UserController::class, 'getActivityStatsApi']);
+    Route::get('/user/profile', [UserController::class, 'getUserProfile']);
 
 
     // Add other protected routes here (e.g., enrolling in a course, accessing user-specific materials)
